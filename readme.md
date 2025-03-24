@@ -15,9 +15,9 @@
 
 ## Ход работы
 
-1. Создание и клонирование репозитория `containers05` на свой компьютер.
+**1. Создание и клонирование репозитория `containers05` на свой компьютер.**
 
-2. Извлечение конфигурационных файлов **apache2**, **php**, **mariadb** из контейнера.
+**2. Извлечение конфигурационных файлов **apache2**, **php**, **mariadb** из контейнера.**
 
 В папке `containers05` я создал новую папку `files`, в которой создал:
 
@@ -52,9 +52,13 @@ docker cp apache2-php-mariadb:/etc/php/8.2/apache2/php.ini files/php/
 docker cp apache2-php-mariadb:/etc/mysql/mariadb.conf.d/50-server.cnf files/mariadb/
 ```
 
-После их выполнения, в папке `files/` появились файлы конфигурации apache2, php, mariadb. Затем я остановил и удалил контейнер `apache2-php-mariadb`.
+После их выполнения, в папке `files/` появились файлы конфигурации apache2, php, mariadb.
 
-3. Настройка конфигурационных файлов
+![image](https://i.imgur.com/CFCWALK.jpeg)
+
+Затем я остановил и удалил контейнер `apache2-php-mariadb`.
+
+**3. Настройка конфигурационных файлов**
 
 ## Конфигурационный файл apache2:
 
@@ -66,11 +70,15 @@ docker cp apache2-php-mariadb:/etc/mysql/mariadb.conf.d/50-server.cnf files/mari
 
 `DirectoryIndex index.php index.html`
 
+![image](https://i.imgur.com/PqP6kcj.jpeg)
+
 Сохранил изменения в данном файле и закрыл его.
 
 - В конце файла `files/apache2/apache2.conf` добавил следующую строку:
 
 `ServerName localhost`
+
+![image](https://i.imgur.com/VnxGZk5.jpeg)
 
 ## Конфигурационный файл php:
 
@@ -93,7 +101,7 @@ max_execution_time = 120
 
 Сохранил изменения в данном файле и закрыл его.
 
-4. Создание скрипта запуска
+**4. Создание скрипта запуска**
 
 - Создал в папке `files` папку `supervisor` и файл `supervisord.conf` со следующим содержимым:
 
@@ -122,7 +130,9 @@ stderr_logfile=/proc/self/fd/2
 user=mysql
 ```
 
-5. Создание Dockerfile
+![image](https://i.imgur.com/Wha743v.jpeg)
+
+**5. Создание Dockerfile**
 
 Открыл файл `Dockerfile` и добавил в него следующие строки:
 
@@ -190,7 +200,7 @@ EXPOSE 80
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 ```
 
-6. Создание базы данных и пользователя
+**6. Создание базы данных и пользователя**
 
 Создал базу данных `wordpress` и пользователя **wordpress** с паролем **wordpress** в контейнере `apache2-php-mariadb`. Для этого, в контейнере `apache2-php-mariadb`, выполнил команды:
 
@@ -204,7 +214,9 @@ FLUSH PRIVILEGES;
 EXIT;
 ```
 
-7. Создание файла конфигурации WordPress
+![image](https://i.imgur.com/CtCSs4f.jpeg)
+
+**7. Создание файла конфигурации WordPress**
 
 Открыл в браузере сайт WordPress по адресу `http://localhost/`. Указал параметры подключения к базе данных:
 
@@ -214,9 +226,13 @@ EXIT;
 - адрес сервера базы данных: **localhost**;
 - префикс таблиц: **wp_**.
 
+![image](https://i.imgur.com/ugWfz99.jpeg)
+
 Скопировал содержимое файла конфигурации в файл `files/wp-config.php` на компьютере.
 
-8. Добавление файла конфигурации WordPress в Dockerfile
+![image](https://i.imgur.com/LcBndwl.jpeg)
+
+**8. Добавление файла конфигурации WordPress в Dockerfile**
 
 Добавил в файл **Dockerfile** следующие строки:
 
@@ -224,13 +240,19 @@ EXIT;
 COPY files/wp-config.php /var/www/html/wordpress/wp-config.php
 ```
 
-9. Запуск и тестирование
+**9. Запуск и тестирование**
 
 Пересобрал образ контейнера с именем `apache2-php-mariadb` и запустил контейнер `apache2-php-mariadb` из образа `apache2-php-mariadb`. Проверил работоспособность сайта WordPress.
 
+![image](https://i.imgur.com/msITiFa.jpeg)
+
+![image](https://i.imgur.com/tMLcVi2.jpeg)
+
+![image](https://i.imgur.com/zRwewwH.jpeg)
+
 ## Ответы на вопросы
 
-1. Какие файлы конфигурации были изменены?
+**_1. Какие файлы конфигурации были изменены?_**
 
 Изменены следующие файлы:
 
@@ -246,11 +268,11 @@ COPY files/wp-config.php /var/www/html/wordpress/wp-config.php
 
 - files/wp-config.php – конфигурация WordPress
 
-2. За что отвечает инструкция DirectoryIndex в файле конфигурации apache2?
+**_2. За что отвечает инструкция DirectoryIndex в файле конфигурации apache2?_**
 
 Инструкция DirectoryIndex указывает, какой файл Apache должен загружать по умолчанию, если пользователь обращается к каталогу.
 
-3. Зачем нужен файл wp-config.php?
+**_3. Зачем нужен файл wp-config.php?_**
 
 Файл wp-config.php содержит основные настройки WordPress, включая:
 
@@ -262,11 +284,11 @@ COPY files/wp-config.php /var/www/html/wordpress/wp-config.php
 
 Без этого файла WordPress не может работать.
 
-4. За что отвечает параметр post_max_size в файле конфигурации PHP?
+**4. _За что отвечает параметр `post_max_size` в файле конфигурации PHP?_**
 
 Параметр post_max_size определяет максимальный размер всех данных, отправляемых методом POST. Это включает формы, файлы и другие данные.
 
-5. Укажите, на ваш взгляд, какие недостатки есть в созданном образе контейнера?
+**_5. Укажите, на ваш взгляд, какие недостатки есть в созданном образе контейнера?_**
 
 Возможные недостатки:
 
